@@ -9,6 +9,13 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
+  variables:
+  # the name of the service connection that you created above
+  serviceConnectionToAzure: shrnisha
+  # the name of your web app here is the same one you used above
+  # when you created the web app using the Azure CLI
+  appName: boxfuse
+
 steps:
 - task: Maven@3
   inputs:
@@ -29,3 +36,10 @@ steps:
   inputs:
     artifactName: 'war'
     pathToPublish: '$(build.artifactStagingDirectory)'
+- task: AzureFunctionApp@1
+  displayName: Azure Function App deploy
+  inputs:
+    azureSubscription: $(serviceConnectionToAzure)
+    appType: functionApp
+    appName: $(appName)
+    package: $(build.artifactstagingdirectory)/javafunctions
